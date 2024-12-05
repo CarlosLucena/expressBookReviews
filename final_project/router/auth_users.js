@@ -45,16 +45,20 @@ regd_users.put("/auth/review/:isbn", (req, res) => {
   if (!book) { return res.status(404); }
   
   let username = req.user 
-  let userReview = req.body.review
-  let review = book.reviews.filter(r => r.username === username)
-  if (review) {
-    review.review = userReview
-  } else {
-    book.reviews.push({username: userReview})
-  }
-  return res.status(200);
+  book.reviews[username] = req.body.review
+  return res.status(200).json({ 'message': 'Review added!'});
 });
 
+regd_users.delete("/auth/review/:isbn", (req, res) => {
+    const book = books[req.params.isbn]
+    if (!book) { return res.status(404); }
+    
+    let username = req.user 
+    delete book.reviews[username]
+    return res.status(200).json({ 'message': 'Review delete!'});
+  });
+  
+  
 module.exports.authenticated = regd_users;
 module.exports.isValid = isValid;
 module.exports.users = users;
