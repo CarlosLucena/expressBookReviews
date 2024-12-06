@@ -64,14 +64,25 @@ function fetchBookByIsbn(isbn) {
 }
 
 // Get book details based on author
-public_users.get('/author/:author',function (req, res) {
-  //Write your code here
-  let rslt = Object.fromEntries(Object.entries(books).filter(book => book[1]["author"] == req.params.author))
-  if (rslt) {
-    return res.status(200).json(rslt);
+public_users.get('/author/:author',async (req, res) => {
+  try {
+      const books = await fetchBooksByAuthor(req.params.author);
+      if (books) {
+        return res.status(200).json(books);
+      }
+      return res.status(404);
+  } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: 'Failed to fetch books!' });
   }
-  return res.status(404);
 });
+function fetchBooksByAuthor(author) {
+  return new Promise((resolve,reject) => {
+  setTimeout(() => {
+    const booksFilterByAuthor = Object.fromEntries(Object.entries(books).filter(book => book[1]["author"] === author))
+    resolve(booksFilterByAuthor)
+  },500)})
+}
 
 // Get all books based on title
 public_users.get('/title/:title',function (req, res) {
